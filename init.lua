@@ -1,10 +1,13 @@
+vim.cmd("colorscheme onedark")
 require("config.lazy");
 require "user.keyMaps"
 require "user.options"
+require("onedarkpro.helpers")
 
 -- Plugins
 local buffLine = require("bufferline")
 local mason = require("mason")
+local null_ls = require("null-ls")
 local npairs = require('npairs')
 
 mason.setup()
@@ -13,6 +16,13 @@ require("mason-lspconfig").setup({
 })
 require("lspconfig").ts_ls.setup({})
 require("lspconfig").lua_ls.setup({})
+
+
+null_ls.setup({
+    sources = {
+        null_ls.builtins.formatting.prettier,
+    },
+})
 
 vim.cmd('autocmd FileType javascript setlocal shiftwidth=2')
 
@@ -38,31 +48,8 @@ require("toggleterm").setup {
 
 require("ibl").setup()
 
-require("onedarkpro").setup {
-    options = {
-        cursorline = true,
-        cursorcolumn = true,
-    },
-    colors = {
-        onedark = {
-            bg = "#1a1d24",
-        }
-    }
-}
-require("onedarkpro").load()
-
-
 require("completions")
 
-
-
-local null_ls = require("null-ls")
-
-null_ls.setup({
-    sources = {
-        null_ls.builtins.formatting.prettier,
-    },
-})
 
 
 function ToggleFold()
@@ -85,11 +72,9 @@ buffLine.setup {
         buffer_close_icon = '󰅖',
         modified_icon = '▲ ',
         separator_style = 'slant',
-        numbers = "none",
+        show_close_icon = false,
         color_icons = true,
         diagnostics = "nvim_lsp",
-        --        indicator = {
-        --            style = 'underline',
-        --        },
+        middle_mouse_command = "bdelete! %d",
     },
 }

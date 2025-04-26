@@ -30,9 +30,8 @@ return {
     -- tmux
     "christoomey/vim-tmux-navigator",
     "mfussenegger/nvim-jdtls",
-
-    'jose-elias-alvarez/null-ls.nvim',
     'nvim-lua/plenary.nvim',
+    "nvimtools/none-ls.nvim",
     {
         "nvim-neo-tree/neo-tree.nvim",
         branch = "v3.x",

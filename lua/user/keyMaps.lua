@@ -4,7 +4,7 @@ local opts = { noremap = true, silent = true}
 -- just a constante to do things easier
 local km = vim.keymap.set
 km("v", "p", '"_dP', opts)
-
+vim.cmd(' autocmd TermOpen * startinsert ')
 -- Set leader key
 vim.g.mapleader = ' '
 
@@ -17,7 +17,8 @@ km(
 )
 -- Save, quit
 km('n', '<space>w', '<cmd>:w<cr>')
-km('n', '<space>q', '<cmd>:bd<cr>')
+km('n', '<space>q', '<cmd>:q<cr>')
+km('n', '<space>x', '<cmd>:bd<cr>')
 km('n', '<space>wq', '<cmd>:wq<cr>')
 
 km('n', '<leader>t', ':Neotree toggle=true<cr>', opts)
