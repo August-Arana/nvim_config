@@ -9,14 +9,25 @@ local buffLine = require("bufferline")
 local mason = require("mason")
 local null_ls = require("null-ls")
 local npairs = require('npairs')
+local lspconfig = require("lspconfig")
 
 mason.setup()
 require("mason-lspconfig").setup({
     ensure_installed = { 'ts_ls' }
 })
-require("lspconfig").ts_ls.setup({})
-require("lspconfig").lua_ls.setup({})
+lspconfig.ts_ls.setup({})
+lspconfig.lua_ls.setup({})
+local elixir_ls_path = vim.fn.stdpath("data") .. "/mason/packages/elixir-ls/language_server.sh"
 
+lspconfig.elixirls.setup({
+    cmd = { elixir_ls_path },
+    settings = {
+        elixirLS = {
+            dialyzerEnabled = false,
+            fetchDeps = false
+        }
+    }
+})
 
 null_ls.setup({
     sources = {
@@ -73,6 +84,7 @@ buffLine.setup {
         modified_icon = '▲ ',
         separator_style = 'slant',
         show_close_icon = false,
+        mode = 'tabs',
         color_icons = true,
         diagnostics = "nvim_lsp",
         middle_mouse_command = "bdelete! %d",
