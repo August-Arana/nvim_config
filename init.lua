@@ -1,14 +1,14 @@
-vim.cmd("colorscheme onedark")
 require("config.lazy");
 require "user.keyMaps"
+vim.cmd("colorscheme onedark")
 require "user.options"
 require("onedarkpro.helpers")
+require "lualine.luline"
 
 -- Plugins
 local buffLine = require("bufferline")
 local mason = require("mason")
 local null_ls = require("null-ls")
-local npairs = require('npairs')
 local lspconfig = require("lspconfig")
 
 mason.setup()
@@ -40,7 +40,6 @@ vim.cmd('autocmd FileType javascript setlocal shiftwidth=2')
 vim.cmd('filetype plugin indent on')
 vim.cmd("autocmd FileType perl setlocal equalprg=perltidy\\ -st")
 
-local npairs = require('nvim-autopairs')
 
 require("toggleterm").setup {
     size = 20,
