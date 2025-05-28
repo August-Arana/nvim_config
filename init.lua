@@ -2,7 +2,7 @@ require("config.lazy");
 require "user.keyMaps"
 vim.cmd("colorscheme onedark")
 require "user.options"
-require("onedarkpro.helpers")
+-- require("onedarkpro.helpers")
 require "lualine.luline"
 
 -- Plugins
@@ -27,6 +27,22 @@ lspconfig.elixirls.setup({
             fetchDeps = false
         }
     }
+})
+
+lspconfig.clangd.setup({
+    settings = {
+        clangd = {
+            arguments = {
+                '-I./',
+                '-I./src',
+                '-Wall',
+                '-pedantic-errors',
+                '-std=gnu89',
+                '-O3',
+                '-pthread',
+            },
+        },
+    },
 })
 
 null_ls.setup({
@@ -89,3 +105,4 @@ buffLine.setup {
         middle_mouse_command = "bdelete! %d",
     },
 }
+
