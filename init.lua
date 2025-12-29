@@ -1,7 +1,7 @@
 require("config.lazy");
 require "user.keyMaps"
-vim.cmd("colorscheme onedark")
 require "user.options"
+vim.cmd("colorscheme gruvbox")
 -- require("onedarkpro.helpers")
 require "lualine.luline"
 
@@ -10,39 +10,34 @@ local buffLine = require("bufferline")
 local mason = require("mason")
 local null_ls = require("null-ls")
 local lspconfig = require("lspconfig")
+local aerial = require("aerial")
 
 mason.setup()
-require("mason-lspconfig").setup({
-    ensure_installed = { 'ts_ls' }
-})
+require("mason-lspconfig");
 lspconfig.ts_ls.setup({})
 lspconfig.lua_ls.setup({})
-local elixir_ls_path = vim.fn.stdpath("data") .. "/mason/packages/elixir-ls/language_server.sh"
-
-lspconfig.elixirls.setup({
-    cmd = { elixir_ls_path },
-    settings = {
-        elixirLS = {
-            dialyzerEnabled = false,
-            fetchDeps = false
-        }
-    }
+lspconfig.clangd.setup({
+    cmd = { "clangd" },
+    filetypes = { "c", "cpp", "objc", "objcpp" },
+    root_dir = lspconfig.util.root_pattern("compile_commands.json", "compile_flags.txt", ".git"),
 })
 
-lspconfig.clangd.setup({
+aerial.setup({
+    attach_mode = "window", -- track the cursor
+    highlight_on_hover = true,
+})
+
+lspconfig.perlnavigator.setup({
+    cmd = { "perlnavigator", "--stdio" },
+    filetypes = { "perl" },
+    root_dir = lspconfig.util.root_pattern(".git", "Makefile.PL", "Build.PL", "."),
     settings = {
-        clangd = {
-            arguments = {
-                '-I./',
-                '-I./src',
-                '-Wall',
-                '-pedantic-errors',
-                '-std=gnu89',
-                '-O3',
-                '-pthread',
-            },
-        },
-    },
+        perlnavigator = {
+            perlPath = "perl",
+            enableWarnings = true,
+            formatOnSave = true,
+        }
+    }
 })
 
 null_ls.setup({
@@ -106,3 +101,32 @@ buffLine.setup {
     },
 }
 
+
+
+
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities.workspace = capabilities.workspace or {}
+capabilities.workspace.didChangeWatchedFiles = { dynamicRegistration = true }
+
+lspconfig.perlnavigator.setup {
+    capabilities = capabilities,
+    settings = {
+        perlnavigator = {
+            perlPath = "/root/perl5/perlbrew/perls/perl-5.16.3/bin/perl", -- RUTA EXACTA DE TU PERL
+            enableWarnings = true,
+            diagnosticsEnabled = true,
+            perlParams = "-Ilib", -- Ajusta si tienes librerías locales
+            includePaths = { "lib" },
+        }
+    }
+}
+
+-- Opcional: refrescar diagnósticos al guardar
+vim.api.nvim_create_autocmd("BufWritePost", {
+    pattern = "*.pl,*.pm",
+    callback = function()
+        vim.lsp.buf.clear_references()
+        vim.lsp.buf.document_highlight()
+        vim.lsp.buf.format({ async = true })
+    end
+})

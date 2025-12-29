@@ -55,5 +55,10 @@ return {
             'BurntSushi/ripgrep',
         }
     },
-
+    'morhetz/gruvbox',
+    'stevearc/aerial.nvim',
+    {
+        "folke/todo-comments.nvim",
+        dependencies = { "nvim-lua/plenary.nvim" },
+    }
 }

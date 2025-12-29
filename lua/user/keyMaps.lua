@@ -38,10 +38,10 @@ km("n", "<C-d>", ":vertical resize +2<CR>", opts)
 km("n", "<C-a>", ":vertical resize -2<CR>", opts)
 
 -- move between windows
-km("n", "<C-k>", "<C-w>k", opts)
-km("n", "<C-j>", "<C-w>j", opts)
-km("n", "<C-h>", "<C-w>h", opts)
-km("n", "<C-l>", "<C-w>l", opts)
+-- km("n", "<C-k>", "<C-w>k", opts)
+-- km("n", "<C-j>", "<C-w>j", opts)
+-- km("n", "<C-h>", "<C-w>h", opts)
+-- km("n", "<C-l>", "<C-w>l", opts)
 
 -- Visual Mode
 -- Move things
