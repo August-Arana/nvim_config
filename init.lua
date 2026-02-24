@@ -1,36 +1,73 @@
-require("config.lazy");
-require "user.keyMaps"
-require "user.options"
+require("config.lazy")
+require("user.keyMaps")
+require("user.options")
+
 vim.cmd("colorscheme gruvbox")
--- require("onedarkpro.helpers")
-require "lualine.luline"
 
 -- Plugins
 local buffLine = require("bufferline")
 local mason = require("mason")
 local null_ls = require("null-ls")
-local lspconfig = require("lspconfig")
+-- Note: 'lspconfig' require is removed to prevent the 0.11 deprecation warning
 local aerial = require("aerial")
 
+-------------------------------------------------------------------------------
+-- 1. Mason Setup (Run :MasonInstall prettier to fix your error)
+-------------------------------------------------------------------------------
 mason.setup()
-require("mason-lspconfig");
-lspconfig.ts_ls.setup({})
-lspconfig.lua_ls.setup({})
-lspconfig.clangd.setup({
+-- Ensure we have the binaries for the servers we want to use
+require("mason-lspconfig").setup({
+    ensure_installed = { "ts_ls", "lua_ls", "clangd", "perlnavigator" },
+    automatic_installation = true, 
+})
+
+-------------------------------------------------------------------------------
+-- 2. Native LSP Setup (Neovim 0.11+ Standard)
+-------------------------------------------------------------------------------
+-- Helper for root detection using native vim.fs
+local function get_root(markers)
+    return function(fname)
+        return vim.fs.dirname(vim.fs.find(markers, { path = fname, upward = true })[1])
+    end
+end
+
+-- Generate autocomplete capabilities globally
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities.workspace = capabilities.workspace or {}
+capabilities.workspace.didChangeWatchedFiles = { dynamicRegistration = true }
+-- Map nvim-cmp's required capabilities
+capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+
+-- TypeScript / JS
+vim.lsp.config('ts_ls', {
+    capabilities = capabilities
+})
+vim.lsp.enable('ts_ls')
+
+-- Lua
+vim.lsp.config('lua_ls', {
+    capabilities = capabilities,
+    settings = {
+        Lua = { diagnostics = { globals = { 'vim' } } }
+    }
+})
+vim.lsp.enable('lua_ls')
+
+-- Clangd (C/C++)
+vim.lsp.config('clangd', {
+    capabilities = capabilities,
     cmd = { "clangd" },
     filetypes = { "c", "cpp", "objc", "objcpp" },
-    root_dir = lspconfig.util.root_pattern("compile_commands.json", "compile_flags.txt", ".git"),
+    root_dir = get_root({ "compile_commands.json", "compile_flags.txt", ".git" }),
 })
+vim.lsp.enable('clangd')
 
-aerial.setup({
-    attach_mode = "window", -- track the cursor
-    highlight_on_hover = true,
-})
-
-lspconfig.perlnavigator.setup({
+-- PerlNavigator
+vim.lsp.config('perlnavigator', {
+    capabilities = capabilities,
     cmd = { "perlnavigator", "--stdio" },
     filetypes = { "perl" },
-    root_dir = lspconfig.util.root_pattern(".git", "Makefile.PL", "Build.PL", "."),
+    root_dir = get_root({ ".git", "Makefile.PL", "Build.PL", "." }),
     settings = {
         perlnavigator = {
             perlPath = "perl",
@@ -39,24 +76,39 @@ lspconfig.perlnavigator.setup({
         }
     }
 })
+vim.lsp.enable('perlnavigator')
 
+-------------------------------------------------------------------------------
+-- 3. Null-ls / None-ls Setup
+-------------------------------------------------------------------------------
 null_ls.setup({
     sources = {
-        null_ls.builtins.formatting.prettier,
+        null_ls.builtins.formatting.prettier.with({
+            prefer_local = "node_modules/.bin",
+            -- Prevent crashing if prettier isn't found
+            condition = function(utils)
+                return utils.root_has_file({ ".prettierrc", "prettier.config.js" }) 
+                    or vim.fn.executable("prettier") == 1
+            end,
+        }),
     },
 })
 
-vim.cmd('autocmd FileType javascript setlocal shiftwidth=2')
+-------------------------------------------------------------------------------
+-- 4. Other Plugin Configurations
+-------------------------------------------------------------------------------
+aerial.setup({
+    attach_mode = "window",
+    highlight_on_hover = true,
+})
 
-vim.cmd('filetype plugin indent on')
-vim.cmd("autocmd FileType perl setlocal equalprg=perltidy\\ -st")
+-- Corrected lualine require (assuming standard installation)
+require("lualine").setup() 
 
-
-require("toggleterm").setup {
+require("toggleterm").setup({
     size = 20,
     open_mapping = [[<c-t>]],
     hide_numbers = true,
-    shade_filetypes = {},
     shade_terminals = true,
     shading_factor = 1,
     start_in_insert = true,
@@ -65,30 +117,16 @@ require("toggleterm").setup {
     direction = 'float',
     close_on_exit = true,
     shell = vim.o.shell,
-}
-
-require("ibl").setup()
-
-require("completions")
-
-
-
-function ToggleFold()
-    if vim.fn.foldclosed('.') == -1 then
-        vim.cmd('normal! $V%zf')
-    else
-        vim.cmd('normal! zo')
-    end
-end
-
-require("neo-tree").setup({
-    window = {
-        width = 30,
-    },
 })
 
+require("ibl").setup()
+require("completions")
 
-buffLine.setup {
+require("neo-tree").setup({
+    window = { width = 30 },
+})
+
+buffLine.setup({
     options = {
         buffer_close_icon = '󰅖',
         modified_icon = '▲ ',
@@ -99,34 +137,28 @@ buffLine.setup {
         diagnostics = "nvim_lsp",
         middle_mouse_command = "bdelete! %d",
     },
-}
+})
 
+-------------------------------------------------------------------------------
+-- 5. Auto Commands & Settings
+-------------------------------------------------------------------------------
+vim.cmd('autocmd FileType javascript setlocal shiftwidth=2')
+vim.cmd('filetype plugin indent on')
+vim.cmd("autocmd FileType perl setlocal equalprg=perltidy\\ -st")
 
-
-
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities.workspace = capabilities.workspace or {}
-capabilities.workspace.didChangeWatchedFiles = { dynamicRegistration = true }
-
-lspconfig.perlnavigator.setup {
-    capabilities = capabilities,
-    settings = {
-        perlnavigator = {
-            perlPath = "/root/perl5/perlbrew/perls/perl-5.16.3/bin/perl", -- RUTA EXACTA DE TU PERL
-            enableWarnings = true,
-            diagnosticsEnabled = true,
-            perlParams = "-Ilib", -- Ajusta si tienes librerías locales
-            includePaths = { "lib" },
-        }
-    }
-}
-
--- Opcional: refrescar diagnósticos al guardar
+-- Perl formatting on save (Native LSP method)
 vim.api.nvim_create_autocmd("BufWritePost", {
     pattern = "*.pl,*.pm",
     callback = function()
-        vim.lsp.buf.clear_references()
-        vim.lsp.buf.document_highlight()
         vim.lsp.buf.format({ async = true })
     end
 })
+
+-- Fold Toggle Function
+function ToggleFold()
+    if vim.fn.foldclosed('.') == -1 then
+        vim.cmd('normal! $V%zf')
+    else
+        vim.cmd('normal! zo')
+    end
+end
