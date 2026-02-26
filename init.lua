@@ -162,3 +162,9 @@ function ToggleFold()
         vim.cmd('normal! zo')
     end
 end
+
+
+require('codex').status()
+local codex = require("codex")
+codex.setup({})
+vim.keymap.set("n", "<leader>cx", "<cmd>CodexToggle<cr>", { desc = "Codex: Toggle panel", })

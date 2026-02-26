@@ -60,5 +60,6 @@ return {
     {
         "folke/todo-comments.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
-    }
+    },
+        "johnseth97/codex.nvim"
 }
