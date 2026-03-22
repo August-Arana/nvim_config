@@ -52,7 +52,6 @@ return {
         tag = '0.1.8',
         dependencies = {
             'nvim-lua/plenary.nvim',
-            'BurntSushi/ripgrep',
         }
     },
     'morhetz/gruvbox',
@@ -61,5 +60,16 @@ return {
         "folke/todo-comments.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
     },
-        "johnseth97/codex.nvim"
+    "johnseth97/codex.nvim",
+    {
+        "coder/claudecode.nvim",
+        dependencies = { "folke/snacks.nvim" },
+        -- configured in lua/claude.lua
+    },
+    {
+        "MeanderingProgrammer/render-markdown.nvim",
+        dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
+        ft = { "markdown" },
+        opts = {},
+    },
 }

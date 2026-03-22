@@ -11,3 +11,5 @@ vim.opt.relativenumber = true
 vim.opt.termguicolors = true
 
 vim.opt.mousemoveevent = true
+
+vim.opt.clipboard = "unnamedplus"

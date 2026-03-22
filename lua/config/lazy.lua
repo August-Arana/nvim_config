@@ -21,6 +21,10 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
+-- Disable vim-tmux-navigator's built-in terminal mappings so they don't
+-- interfere with terminal buffers like the Claude Code panel.
+vim.g.tmux_navigator_no_mappings = 1
+
 -- Setup lazy.nvim
 require("lazy").setup({
   spec = {

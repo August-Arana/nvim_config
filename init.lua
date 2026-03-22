@@ -2,7 +2,15 @@ require("config.lazy")
 require("user.keyMaps")
 require("user.options")
 
-vim.cmd("colorscheme gruvbox")
+require('onedark').setup({
+    highlights = {
+        CursorLine   = { bg = '#2c313a' },
+        CursorColumn = { bg = '#2c313a' },
+    }
+})
+
+-- vim.cmd("colorscheme gruvbox")
+require('onedark').load()
 
 -- Plugins
 local buffLine = require("bufferline")
@@ -24,13 +32,6 @@ require("mason-lspconfig").setup({
 -------------------------------------------------------------------------------
 -- 2. Native LSP Setup (Neovim 0.11+ Standard)
 -------------------------------------------------------------------------------
--- Helper for root detection using native vim.fs
-local function get_root(markers)
-    return function(fname)
-        return vim.fs.dirname(vim.fs.find(markers, { path = fname, upward = true })[1])
-    end
-end
-
 -- Generate autocomplete capabilities globally
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.workspace = capabilities.workspace or {}
@@ -58,7 +59,7 @@ vim.lsp.config('clangd', {
     capabilities = capabilities,
     cmd = { "clangd" },
     filetypes = { "c", "cpp", "objc", "objcpp" },
-    root_dir = get_root({ "compile_commands.json", "compile_flags.txt", ".git" }),
+    root_markers = { "compile_commands.json", "compile_flags.txt", ".git" },
 })
 vim.lsp.enable('clangd')
 
@@ -67,7 +68,7 @@ vim.lsp.config('perlnavigator', {
     capabilities = capabilities,
     cmd = { "perlnavigator", "--stdio" },
     filetypes = { "perl" },
-    root_dir = get_root({ ".git", "Makefile.PL", "Build.PL", "." }),
+    root_markers = { ".git", "Makefile.PL", "Build.PL" },
     settings = {
         perlnavigator = {
             perlPath = "perl",
@@ -142,15 +143,20 @@ buffLine.setup({
 -------------------------------------------------------------------------------
 -- 5. Auto Commands & Settings
 -------------------------------------------------------------------------------
-vim.cmd('autocmd FileType javascript setlocal shiftwidth=2')
-vim.cmd('filetype plugin indent on')
-vim.cmd("autocmd FileType perl setlocal equalprg=perltidy\\ -st")
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "javascript",
+    callback = function() vim.opt_local.shiftwidth = 2 end,
+})
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "perl",
+    callback = function() vim.opt_local.equalprg = "perltidy -st" end,
+})
 
 -- Perl formatting on save (Native LSP method)
-vim.api.nvim_create_autocmd("BufWritePost", {
-    pattern = "*.pl,*.pm",
+vim.api.nvim_create_autocmd("BufWritePre", {
+    pattern = { "*.pl", "*.pm" },
     callback = function()
-        vim.lsp.buf.format({ async = true })
+        vim.lsp.buf.format({ async = false })
     end
 })
 
@@ -164,7 +170,9 @@ function ToggleFold()
 end
 
 
-require('codex').status()
+require("claude")
+
 local codex = require("codex")
 codex.setup({})
+codex.status()
 vim.keymap.set("n", "<leader>cx", "<cmd>CodexToggle<cr>", { desc = "Codex: Toggle panel", })
