@@ -72,4 +72,10 @@ return {
         ft = { "markdown" },
         opts = {},
     },
+    {
+        "catppuccin/nvim",
+        name = "catppuccin",
+        priority = 1000
+    },
+    "sphamba/smear-cursor.nvim",
 }

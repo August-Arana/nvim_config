@@ -2,15 +2,16 @@ require("config.lazy")
 require("user.keyMaps")
 require("user.options")
 
-require('onedark').setup({
-    highlights = {
-        CursorLine   = { bg = '#2c313a' },
-        CursorColumn = { bg = '#2c313a' },
-    }
-})
+--require('onedark').setup({
+--    highlights = {
+--        CursorLine   = { bg = '#2c313a' },
+--        CursorColumn = { bg = '#2c313a' },
+--    }
+--})
 
 -- vim.cmd("colorscheme gruvbox")
-require('onedark').load()
+--require('onedark').load()
+vim.cmd("colorscheme catppuccin-mocha")
 
 -- Plugins
 local buffLine = require("bufferline")
