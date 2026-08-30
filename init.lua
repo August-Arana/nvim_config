@@ -2,15 +2,6 @@ require("config.lazy")
 require("user.keyMaps")
 require("user.options")
 
---require('onedark').setup({
---    highlights = {
---        CursorLine   = { bg = '#2c313a' },
---        CursorColumn = { bg = '#2c313a' },
---    }
---})
-
--- vim.cmd("colorscheme gruvbox")
---require('onedark').load()
 vim.cmd("colorscheme catppuccin-mocha")
 
 -- Plugins
@@ -177,3 +168,27 @@ local codex = require("codex")
 codex.setup({})
 codex.status()
 vim.keymap.set("n", "<leader>cx", "<cmd>CodexToggle<cr>", { desc = "Codex: Toggle panel", })
+
+
+require("conform").setup({
+  formatters_by_ft = {
+    sql = { "sqlfluff" },
+    php = { "pretty-php" },
+  },
+})
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+    pattern = { "*.php" },
+    callback = function()
+        require("conform").format({ async = false, lsp_fallback = true })
+    end,
+})
+
+
+vim.keymap.set("n", "<leader>ss", function()
+  local handle = io.popen("~/bin/paste_image.sh")
+  local result = handle:read("*a")
+  handle:close()
+
+  vim.api.nvim_put({ result }, "l", true, true)
+end)

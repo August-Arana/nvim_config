@@ -1,10 +1,6 @@
 return {
     "olimorris/onedarkpro.nvim",
-    -- nvim-treesitter
     "nvim-treesitter/nvim-treesitter",
-    -- airline
-    -- "vim-airline/vim-airline",
-    -- "vim-airline/vim-airline-themes",
     {
         'nvim-lualine/lualine.nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' }
@@ -78,4 +74,9 @@ return {
         priority = 1000
     },
     "sphamba/smear-cursor.nvim",
+    "tpope/vim-fugitive",
+    {
+        "stevearc/conform.nvim",
+        opts = {},
+    }
 }

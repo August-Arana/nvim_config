@@ -8,16 +8,6 @@ vim.cmd(' autocmd TermOpen * startinsert ')
 -- Set leader key
 vim.g.mapleader = ' '
 
--- Normal mode Keymaps
--- Only C compiler:
---km(
---    "n",
---    "<space>cc",
---   ':execute("!gnome-terminal -- bash -c \'gcc " . shellescape("%") . " -o " . shellescape("%<") . " && ./" . shellescape("%<") . "\'")<CR>',
---   opts 
---)
-
--- for C++ and C
 
 km("n", "<space>cc", function()
   local compiler = "gcc"
@@ -45,7 +35,10 @@ km('n', '<space>wq', '<cmd>:wq<cr>')
 
 km('n', '<leader>t', ':Neotree toggle=true<cr>', opts)
 km('n', '<leader>e', ':Lexplore 20<cr>', opts)
-km("n", "<leader>p", "<cmd>lua vim.lsp.buf.format({ timeout_ms = 5000 })<CR>", opts)
+km("n", "<leader>e", vim.diagnostic.open_float)
+km("n", "<leader>p", function()
+    require("conform").format({ async = false, lsp_fallback = true, timeout_ms = 5000 })
+end, opts)
 km('n', '<leader>a', ':lua ToggleFold()<CR>', opts)
 km('n', '<leader>k', ':BufferLineCycleNext<CR>', opts)
 km('n', '<leader>j', ':BufferLineCyclePrev<CR>', opts)
