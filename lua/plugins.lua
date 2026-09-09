@@ -1,20 +1,12 @@
 return {
-    "olimorris/onedarkpro.nvim",
     "nvim-treesitter/nvim-treesitter",
     {
         'nvim-lualine/lualine.nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' }
     },
-    'famiu/feline.nvim',
-    -- nerdtree
-    "preservim/nerdtree",
-    "ryanoasis/vim-devicons",
-    -- color
-    "navarasu/onedark.nvim",
     -- editing
     "windwp/nvim-autopairs",
     "tpope/vim-surround",
-    "tpope/vim-commentary",
     "lukas-reineke/indent-blankline.nvim",
     -- lsp
     "mfussenegger/nvim-lint",
@@ -50,7 +42,6 @@ return {
             'nvim-lua/plenary.nvim',
         }
     },
-    'morhetz/gruvbox',
     'stevearc/aerial.nvim',
     {
         "folke/todo-comments.nvim",
