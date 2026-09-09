@@ -1,13 +1,13 @@
 require("config.lazy")
 require("user.keyMaps")
 require("user.options")
+require("formatter")
 
 vim.cmd("colorscheme catppuccin-mocha")
 
 -- Plugins
 local buffLine = require("bufferline")
 local mason = require("mason")
-local null_ls = require("null-ls")
 -- Note: 'lspconfig' require is removed to prevent the 0.11 deprecation warning
 local aerial = require("aerial")
 
@@ -55,37 +55,6 @@ vim.lsp.config('clangd', {
 })
 vim.lsp.enable('clangd')
 
--- PerlNavigator
-vim.lsp.config('perlnavigator', {
-    capabilities = capabilities,
-    cmd = { "perlnavigator", "--stdio" },
-    filetypes = { "perl" },
-    root_markers = { ".git", "Makefile.PL", "Build.PL" },
-    settings = {
-        perlnavigator = {
-            perlPath = "perl",
-            enableWarnings = true,
-            formatOnSave = true,
-        }
-    }
-})
-vim.lsp.enable('perlnavigator')
-
--------------------------------------------------------------------------------
--- 3. Null-ls / None-ls Setup
--------------------------------------------------------------------------------
-null_ls.setup({
-    sources = {
-        null_ls.builtins.formatting.prettier.with({
-            prefer_local = "node_modules/.bin",
-            -- Prevent crashing if prettier isn't found
-            condition = function(utils)
-                return utils.root_has_file({ ".prettierrc", "prettier.config.js" }) 
-                    or vim.fn.executable("prettier") == 1
-            end,
-        }),
-    },
-})
 
 -------------------------------------------------------------------------------
 -- 4. Other Plugin Configurations
@@ -168,21 +137,6 @@ local codex = require("codex")
 codex.setup({})
 codex.status()
 vim.keymap.set("n", "<leader>cx", "<cmd>CodexToggle<cr>", { desc = "Codex: Toggle panel", })
-
-
-require("conform").setup({
-  formatters_by_ft = {
-    sql = { "sqlfluff" },
-    php = { "pretty-php" },
-  },
-})
-
-vim.api.nvim_create_autocmd("BufWritePre", {
-    pattern = { "*.php" },
-    callback = function()
-        require("conform").format({ async = false, lsp_fallback = true })
-    end,
-})
 
 
 vim.keymap.set("n", "<leader>ss", function()

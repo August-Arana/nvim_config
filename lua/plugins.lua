@@ -24,7 +24,6 @@ return {
     "christoomey/vim-tmux-navigator",
     "mfussenegger/nvim-jdtls",
     'nvim-lua/plenary.nvim',
-    "nvimtools/none-ls.nvim",
     {
         "nvim-neo-tree/neo-tree.nvim",
         branch = "v3.x",
