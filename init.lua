@@ -2,6 +2,8 @@ require("config.lazy")
 require("user.keyMaps")
 require("user.options")
 require("formatter")
+require("claude")
+require("lsp")
 
 vim.cmd("colorscheme catppuccin-mocha")
 
@@ -9,13 +11,12 @@ vim.cmd("colorscheme catppuccin-mocha")
 local buffLine = require("bufferline")
 local mason = require("mason")
 local aerial = require("aerial")
+local codex = require("codex")
 
 -------------------------------------------------------------------------------
 -- 1. Mason Setup (Run :MasonInstall prettier to fix your error)
 -------------------------------------------------------------------------------
 mason.setup()
-
-require("lsp")
 
 -------------------------------------------------------------------------------
 -- 2. Other Plugin Configurations
@@ -63,23 +64,11 @@ buffLine.setup({
 })
 
 -------------------------------------------------------------------------------
--- 5. Auto Commands & Settings
+-- 3. Auto Commands & Settings
 -------------------------------------------------------------------------------
 vim.api.nvim_create_autocmd("FileType", {
     pattern = "javascript",
     callback = function() vim.opt_local.shiftwidth = 2 end,
-})
-vim.api.nvim_create_autocmd("FileType", {
-    pattern = "perl",
-    callback = function() vim.opt_local.equalprg = "perltidy -st" end,
-})
-
--- Perl formatting on save (Native LSP method)
-vim.api.nvim_create_autocmd("BufWritePre", {
-    pattern = { "*.pl", "*.pm" },
-    callback = function()
-        vim.lsp.buf.format({ async = false })
-    end
 })
 
 -- Fold Toggle Function
@@ -92,9 +81,7 @@ function ToggleFold()
 end
 
 
-require("claude")
 
-local codex = require("codex")
 codex.setup({})
 codex.status()
 vim.keymap.set("n", "<leader>cx", "<cmd>CodexToggle<cr>", { desc = "Codex: Toggle panel", })
