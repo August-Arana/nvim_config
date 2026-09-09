@@ -11,7 +11,6 @@ return {
     -- lsp
     "mfussenegger/nvim-lint",
     "williamboman/mason.nvim",
-    "neovim/nvim-lspconfig",
     "williamboman/mason-lspconfig.nvim",
     "hrsh7th/nvim-cmp",
     "hrsh7th/cmp-nvim-lsp",

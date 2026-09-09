@@ -8,56 +8,17 @@ vim.cmd("colorscheme catppuccin-mocha")
 -- Plugins
 local buffLine = require("bufferline")
 local mason = require("mason")
--- Note: 'lspconfig' require is removed to prevent the 0.11 deprecation warning
 local aerial = require("aerial")
 
 -------------------------------------------------------------------------------
 -- 1. Mason Setup (Run :MasonInstall prettier to fix your error)
 -------------------------------------------------------------------------------
 mason.setup()
--- Ensure we have the binaries for the servers we want to use
-require("mason-lspconfig").setup({
-    ensure_installed = { "ts_ls", "lua_ls", "clangd", "perlnavigator" },
-    automatic_installation = true, 
-})
+
+require("lsp")
 
 -------------------------------------------------------------------------------
--- 2. Native LSP Setup (Neovim 0.11+ Standard)
--------------------------------------------------------------------------------
--- Generate autocomplete capabilities globally
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities.workspace = capabilities.workspace or {}
-capabilities.workspace.didChangeWatchedFiles = { dynamicRegistration = true }
--- Map nvim-cmp's required capabilities
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
-
--- TypeScript / JS
-vim.lsp.config('ts_ls', {
-    capabilities = capabilities
-})
-vim.lsp.enable('ts_ls')
-
--- Lua
-vim.lsp.config('lua_ls', {
-    capabilities = capabilities,
-    settings = {
-        Lua = { diagnostics = { globals = { 'vim' } } }
-    }
-})
-vim.lsp.enable('lua_ls')
-
--- Clangd (C/C++)
-vim.lsp.config('clangd', {
-    capabilities = capabilities,
-    cmd = { "clangd" },
-    filetypes = { "c", "cpp", "objc", "objcpp" },
-    root_markers = { "compile_commands.json", "compile_flags.txt", ".git" },
-})
-vim.lsp.enable('clangd')
-
-
--------------------------------------------------------------------------------
--- 4. Other Plugin Configurations
+-- 2. Other Plugin Configurations
 -------------------------------------------------------------------------------
 aerial.setup({
     attach_mode = "window",
