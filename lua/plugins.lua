@@ -1,5 +1,10 @@
 return {
-    "nvim-treesitter/nvim-treesitter",
+    {
+        "nvim-treesitter/nvim-treesitter",
+        lazy = false,
+        build = ":TSUpdate",
+    },
+    "neovim/nvim-lspconfig",
     {
         'nvim-lualine/lualine.nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' }
@@ -32,9 +37,9 @@ return {
         }
     },
     'L3MON4D3/LuaSnip',
+    "saadparwaiz1/cmp_luasnip",
     {
         'nvim-telescope/telescope.nvim',
-        tag = '0.1.8',
         dependencies = {
             'nvim-lua/plenary.nvim',
         }
@@ -66,5 +71,14 @@ return {
     {
         "stevearc/conform.nvim",
         opts = {},
-    }
+    },
+    {
+        "olimorris/codecompanion.nvim",
+        version = "^19.0.0",
+        opts = {},
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            "nvim-treesitter/nvim-treesitter",
+        },
+    },
 }

@@ -45,6 +45,9 @@ km('n', '<leader>j', ':BufferLineCyclePrev<CR>', opts)
 km('n', '<leader>M', ':Mason<CR>', opts)
 km('n', '<leader>ff', ':Telescope find_files<CR>', opts)
 km('n', '<leader>fg', ':Telescope live_grep<CR>', opts)
+km('n', '<leader>fb', ':Telescope buffers<CR>', opts)
+-- ver keys mas adelantes
+
 
 -- Markdown
 km('n', '<leader>md', '<cmd>RenderMarkdown toggle<CR>', opts)
@@ -54,12 +57,6 @@ km("n", "<C-w>", ":resize -2<CR>", opts)
 km("n", "<C-s>", ":resize +2<CR>", opts)
 km("n", "<C-d>", ":vertical resize +2<CR>", opts)
 km("n", "<C-a>", ":vertical resize -2<CR>", opts)
-
--- move between windows
--- km("n", "<C-k>", "<C-w>k", opts)
--- km("n", "<C-j>", "<C-w>j", opts)
--- km("n", "<C-h>", "<C-w>h", opts)
--- km("n", "<C-l>", "<C-w>l", opts)
 
 -- Visual Mode
 -- Move things

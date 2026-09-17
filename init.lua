@@ -1,9 +1,11 @@
 require("config.lazy")
+require("formatter")
+require("completions")
 require("user.keyMaps")
 require("user.options")
-require("formatter")
 require("claude")
 require("lsp")
+require("gpt")
 
 vim.cmd("colorscheme catppuccin-mocha")
 
@@ -27,7 +29,7 @@ aerial.setup({
 })
 
 -- Corrected lualine require (assuming standard installation)
-require("lualine").setup() 
+require("lualine").setup()
 
 require("toggleterm").setup({
     size = 20,
@@ -44,7 +46,6 @@ require("toggleterm").setup({
 })
 
 require("ibl").setup()
-require("completions")
 
 require("neo-tree").setup({
     window = { width = 30 },
@@ -82,9 +83,9 @@ end
 
 
 
-codex.setup({})
-codex.status()
-vim.keymap.set("n", "<leader>cx", "<cmd>CodexToggle<cr>", { desc = "Codex: Toggle panel", })
+-- codex.setup({})
+-- codex.status()
+-- vim.keymap.set("n", "<leader>cx", "<cmd>CodexToggle<cr>", { desc = "Codex: Toggle panel", })
 
 
 vim.keymap.set("n", "<leader>ss", function()
@@ -94,3 +95,31 @@ vim.keymap.set("n", "<leader>ss", function()
 
   vim.api.nvim_put({ result }, "l", true, true)
 end)
+
+local treesitter = require("nvim-treesitter")
+
+treesitter.install({
+    "javascript",
+    "typescript",
+    "tsx",
+    "html",
+    "css",
+    "json",
+    "lua",
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = {
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact",
+        "html",
+        "css",
+        "json",
+        "lua",
+    },
+    callback = function()
+        vim.treesitter.start()
+    end,
+})
