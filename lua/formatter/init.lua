@@ -18,3 +18,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
         require("conform").format({ async = false, lsp_fallback = true })
     end,
 })
+
+vim.keymap.set({ "n", "v" }, "<leader>cf", function()
+    require("conform").format({ async = true, lsp_fallback = true })
+end, { desc = "Format buffer (conform)" })

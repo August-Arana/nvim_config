@@ -49,7 +49,6 @@ return {
         "folke/todo-comments.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
     },
-    "johnseth97/codex.nvim",
     {
         "coder/claudecode.nvim",
         dependencies = { "folke/snacks.nvim" },
@@ -70,7 +69,18 @@ return {
     "tpope/vim-fugitive",
     {
         "stevearc/conform.nvim",
-        opts = {},
+        event = { "BufWritePre" },
+        cmd = { "ConformInfo" },
+        -- configured in lua/formatter/init.lua
+    },
+    {
+        "folke/snacks.nvim",
+        priority = 1000,
+        lazy = false,
+        -- configured in lua/config/snacks/init.lua
+        opts = function()
+            return require("config.snacks")
+        end,
     },
     {
         "olimorris/codecompanion.nvim",

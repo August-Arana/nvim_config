@@ -5,7 +5,6 @@ require("user.keyMaps")
 require("user.options")
 require("claude")
 require("lsp")
-require("gpt")
 
 vim.cmd("colorscheme catppuccin-mocha")
 
@@ -13,7 +12,6 @@ vim.cmd("colorscheme catppuccin-mocha")
 local buffLine = require("bufferline")
 local mason = require("mason")
 local aerial = require("aerial")
-local codex = require("codex")
 
 -------------------------------------------------------------------------------
 -- 1. Mason Setup (Run :MasonInstall prettier to fix your error)
@@ -83,11 +81,6 @@ end
 
 
 
--- codex.setup({})
--- codex.status()
--- vim.keymap.set("n", "<leader>cx", "<cmd>CodexToggle<cr>", { desc = "Codex: Toggle panel", })
-
-
 vim.keymap.set("n", "<leader>ss", function()
   local handle = io.popen("~/bin/paste_image.sh")
   local result = handle:read("*a")
@@ -106,6 +99,7 @@ treesitter.install({
     "css",
     "json",
     "lua",
+    "java",
 })
 
 vim.api.nvim_create_autocmd("FileType", {
@@ -118,6 +112,7 @@ vim.api.nvim_create_autocmd("FileType", {
         "css",
         "json",
         "lua",
+        "java",
     },
     callback = function()
         vim.treesitter.start()
