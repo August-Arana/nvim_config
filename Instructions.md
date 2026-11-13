@@ -84,6 +84,28 @@ Terminal opens in insert mode automatically.
 | `<C-e>` | Abort completion |
 | `<C-b>` / `<C-f>` | Scroll docs up / down |
 
+### Java (only in `.java` buffers — `ftplugin/java.lua`)
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `<leader>jr` | Normal | **Run** the program in a floating terminal (`mvn -q compile exec:java`, `gradle run`, or `java File.java` for a loose file) |
+| `<leader>jt` | Normal | Run all tests (`mvn test` / `gradle test`) |
+| `<leader>jT` | Normal | Run tests of the current class only |
+| `<leader>ja` | Normal / Visual | Code actions: generate constructors, getters/setters, `toString`, implement interface methods, add imports… |
+| `<leader>jo` | Normal | Organize imports |
+| `<leader>jv` | Normal / Visual | Extract variable |
+| `<leader>jc` | Normal / Visual | Extract constant |
+| `<leader>jm` | Visual | Extract method |
+| `<leader>jh` | Normal | Toggle inlay hints (parameter names in calls) |
+| `<leader>rn` | Normal | Rename symbol across the project |
+| `gd` / `gD` | Normal | Go to definition / declaration |
+| `K` | Normal | Hover documentation |
+| `]d` / `[d` | Normal | Next / previous diagnostic (with float) |
+
+Built-in Neovim LSP maps that also work: `grr` references, `gri` implementations, `grn` rename, `gra` code action, `gO` document symbols, `<C-s>` (insert) signature help.
+
+> `<leader>ca` is intentionally **not** used for Java code actions — it belongs to Claude Code.
+
 ### Claude Code (AI Assistant)
 
 | Key | Mode | Action |
@@ -135,8 +157,8 @@ Terminal opens in insert mode automatically.
 - **nvim-lint** — async linting (separate from LSP diagnostics)
 
 ### Language-Specific
-- **nvim-jdtls** — Java LSP client (Eclipse JDT); installed for Java project support
-- **nvim-treesitter** — syntax highlighting and code understanding via AST parsing
+- **nvim-jdtls** — Java LSP client (Eclipse JDT); started from `ftplugin/java.lua` (see **Java Setup** below)
+- **nvim-treesitter** — syntax highlighting and code understanding via AST parsing (parsers: js, ts, tsx, html, css, json, lua, java)
 
 ### Editing
 - **nvim-autopairs** — auto-closes brackets, quotes, etc.
@@ -165,6 +187,7 @@ Terminal opens in insert mode automatically.
 | `lua_ls` | Lua | `vim` global suppressed |
 | `clangd` | C / C++ | needs `compile_commands.json` or `.git` at root |
 | `perlnavigator` | Perl | formats on save via `perlnavigator` |
+| `jdtls` | Java | installed with Mason; **not** in `vim.lsp.enable` — started by `ftplugin/java.lua` via nvim-jdtls |
 
 Prettier (via none-ls) formats JS/TS files when a `.prettierrc` or `prettier.config.js` is present, or when `prettier` is in `$PATH`.
 
@@ -175,6 +198,51 @@ Prettier (via none-ls) formats JS/TS files when a `.prettierrc` or `prettier.con
 - **Perl files** (`.pl`, `.pm`): formatted on save via `vim.lsp.buf.format`
 - **JavaScript files**: `shiftwidth` set to 2 (overrides the global 4)
 - **Terminal buffers**: start in insert mode automatically
+
+---
+
+## Java Setup
+
+### System tooling (outside Neovim)
+
+Installed with **SDKMAN** (`~/.sdkman`, user-level, no sudo), initialized at the end of `~/.zshrc`:
+
+| Tool | Version | Notes |
+|------|---------|-------|
+| JDK Temurin | 25 LTS | default (`JAVA_HOME` = `~/.sdkman/candidates/java/current`) |
+| JDK OpenJDK | 17 | from apt, `/usr/lib/jvm/java-17-openjdk-amd64` (still available) |
+| Maven | 3.10 | |
+| Gradle | 9.9 | |
+
+```bash
+sdk list java                  # available JDKs
+sdk install java <id>          # install another
+sdk use java <id>              # switch in the current terminal only
+sdk default java <id>          # change the default
+```
+
+### Creating a project: `nuevo-java`
+
+Script at `~/.local/bin/nuevo-java` — Maven + JUnit 5, `Main` class, sample test, `.gitignore`, `git init`.
+
+```bash
+nuevo-java mazmorra                 # package "mazmorra"
+nuevo-java mazmorra com.dnd.acto1   # custom package
+cd mazmorra
+mvn -q compile exec:java            # run Main   (or <leader>jr in nvim)
+mvn test                            # run tests  (or <leader>jt in nvim)
+```
+
+For a single loose file no project is needed: `java File.java` (or `<leader>jr`).
+
+### How jdtls is wired (`ftplugin/java.lua`)
+
+- Runs automatically on every `.java` buffer (`jdtls.start_or_attach`).
+- **Root**: nearest `pom.xml` / `build.gradle(.kts)` / `settings.gradle` / `mvnw` / `gradlew` / `.git`; for loose files, the file's folder.
+- **Workspace** (index): `~/.cache/jdtls/workspace/<project>-<hash>` — outside the project and outside Dropbox. If jdtls gets confused, delete that folder and reopen.
+- **Runtimes**: every JDK under `~/.sdkman/candidates/java/` + the apt JDK 17 (JavaSE-25 is default).
+- Completion capabilities come from `cmp_nvim_lsp`; formatting via `<leader>p` falls back to jdtls.
+- First open of a project takes ~20–40 s while jdtls indexes; later opens are fast.
 
 ---
 
@@ -213,6 +281,8 @@ Mouse drag goes to the X **PRIMARY** selection (not CLIPBOARD). Options:
 ├── init.lua                  # Entry point: loads plugins, LSP, autocmds
 ├── lazy-lock.json            # Locked plugin versions (managed by lazy.nvim)
 ├── Instructions.md           # This file
+├── ftplugin/
+│   └── java.lua              # jdtls startup + Java keymaps (loaded only for .java)
 └── lua/
     ├── plugins.lua           # Plugin list for lazy.nvim
     ├── claude.lua            # Claude Code plugin setup and keymaps
