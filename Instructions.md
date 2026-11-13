@@ -246,31 +246,50 @@ For a single loose file no project is needed: `java File.java` (or `<leader>jr`)
 
 ---
 
-## Clipboard Sharing (Neovim ↔ Tmux)
+## Clipboard Sharing (Neovim ↔ Tmux ↔ System)
 
-Both neovim and tmux are configured to share the X11 system clipboard (`CLIPBOARD` selection) via `xclip`.
+**One rule everywhere:** anything you copy (yank, `y` in tmux copy mode, mouse selection) goes to
+**both** system selections at once:
 
-**How it's wired:**
-- `vim.opt.clipboard = "unnamedplus"` — all neovim yanks/pastes use the system clipboard automatically.
-- `~/.tmux.conf` — tmux copy mode `y` sends to system clipboard: `copy-pipe-and-cancel "xclip -selection clipboard -i"`.
-- `tmux-yank` plugin — mouse selections in tmux copy mode also go to the system clipboard.
+- **CLIPBOARD** → what `Ctrl+V` / `Ctrl+Shift+V` / right-click pastes.
+- **PRIMARY** → what middle-click pastes.
 
-### Copy from tmux → paste in neovim
+So copying in nvim, tmux or any other app gives the same result whichever paste method you use.
 
-1. Enter tmux copy mode: `Ctrl-a [` (or `Ctrl-a y` to also scroll up)
-2. Move with vi keys (`h/j/k/l`), press `v` to start selection, then `y` to copy.
-3. Back in neovim, press `p` / `P` to paste.
+### Behavior
 
-### Copy from neovim → paste in tmux terminal
+| Action | In tmux (shell pane) | In Neovim |
+|--------|----------------------|-----------|
+| Mouse drag selection | Copies to CLIPBOARD + PRIMARY on release | Copies to PRIMARY, keeps visual selection |
+| `y` | Copy mode: copies to CLIPBOARD + PRIMARY | Copies to CLIPBOARD + PRIMARY |
+| `p` / `P` | `Ctrl-a p` pastes system CLIPBOARD | Pastes CLIPBOARD |
+| Middle-click | Pastes system PRIMARY | Pastes PRIMARY (native) |
+| Right-click | Pastes system CLIPBOARD (no tmux menu) | Pastes CLIPBOARD |
+| Alt + right-click | Old tmux pane menu (split, zoom, kill…) | — |
 
-1. Yank in neovim with `y` (or any yank motion) — goes straight to system clipboard.
-2. In the tmux terminal, paste with `Ctrl+Shift+V` or middle-click.
+When the pane runs an app that uses the mouse (Neovim), tmux passes middle/right clicks through
+to it, so Neovim's own mappings apply.
 
-### Mouse drag in a tmux pane
+### How it's wired (Neovim — `lua/user/options.lua`)
 
-Mouse drag goes to the X **PRIMARY** selection (not CLIPBOARD). Options:
-- **Middle-click** to paste PRIMARY anywhere.
-- Or enter copy mode (`Ctrl-a [`), re-select, and press `y` to promote it to CLIPBOARD.
+- `vim.opt.clipboard = "unnamed,unnamedplus"` — `y/d/p` use `"+` (CLIPBOARD); yanks are additionally
+  copied to `"*` (PRIMARY).
+- `x` mode `<LeftRelease>` → `"*ygv` — a mouse selection updates PRIMARY, like any terminal.
+- `<RightMouse>` → paste `"+` (normal, visual and insert mode).
+- Clipboard provider: auto-detected (`wl-copy` if installed, otherwise `xclip`). Check with
+  `:checkhealth provider`.
+
+### How it's wired (tmux — `my-tmux-conf` repo)
+
+- `copy-command` → `scripts/clip-copy.sh`, which writes stdin to CLIPBOARD and PRIMARY.
+- `set-clipboard off` — single copy path (no duplicated OSC52 to Alacritty).
+- Middle/right click and `prefix + p` read via `scripts/clip-paste.sh primary|clipboard`.
+- Both scripts use `wl-clipboard` when available (native Wayland) and fall back to `xclip`.
+
+### Tips
+
+- `Shift` + mouse bypasses tmux/nvim and uses Alacritty's native selection.
+- Recommended on GNOME/Wayland: `sudo apt install wl-clipboard` (picked up automatically).
 
 ---
 
